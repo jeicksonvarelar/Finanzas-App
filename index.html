@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Mi Billetera</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',system-ui,sans-serif;background:#0F1117;color:#E8E8F0;min-height:100vh;max-width:420px;margin:0 auto;padding-bottom:88px;position:relative}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+
+/* ── AUTH ── */
+#auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px}
+.auth-logo{font-size:48px;margin-bottom:12px}
+.auth-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.auth-sub{font-size:14px;color:#6B7099;margin-bottom:32px;text-align:center}
+.auth-card{background:#1A1D2E;border:1px solid #2A2E4A;border-radius:20px;padding:24px;width:100%;max-width:360px}
+.auth-tabs{display:flex;background:#252840;border-radius:10px;padding:3px;gap:3px;margin-bottom:20px}
+.auth-tab{flex:1;padding:9px;border-radius:8px;border:none;font-weight:600;font-size:13px;background:transparent;color:#6B7099;cursor:pointer;transition:all .15s}
+.auth-tab.active{background:#5B6AF0;color:#fff}
+.auth-error{background:#E07A5F22;border:1px solid #E07A5F44;border-radius:10px;padding:10px 14px;font-size:13px;color:#E07A5F;margin-bottom:12px;display:none}
+.auth-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#5B6AF0,#A78BFA);color:#fff;font-weight:700;font-size:15px;margin-top:8px}
+
+/* ── INPUTS ── */
+.field{margin-top:14px}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B7099;margin-bottom:6px}
+.inp{width:100%;background:#1A1D2E;border:1px solid #2A2E4A;border-radius:10px;padding:12px 14px;color:#E8E8F0;font-size:15px;outline:none}
+.inp:focus{border-color:#5B6AF0}
+select.inp{appearance:none;-webkit-appearance:none}
+
+/* ── NAV ── */
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#12141F;border-top:1px solid #2A2E4A;display:flex;padding:8px 0 14px;z-index:100}
+.nav-btn{flex:1;background:none;border:none;color:#6B7099;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn.active{color:#A78BFA}
+.nav-icon{font-size:18px}
+.fab{width:50px;height:50px;border-radius:15px;background:linear-gradient(135deg,#5B6AF0,#A78BFA);border:none;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(91,106,240,.4);cursor:pointer}
+
+/* ── CARDS ── */
+.card{background:#1A1D2E;border-radius:16px;border:1px solid #2A2E4A}
+.card-grad{background:linear-gradient(135deg,#1E2235,#252840);border-radius:20px;border:1px solid #2A2E4A;padding:24px;margin:0 0 16px}
+.mini-card{background:#1A1D2E;border:1px solid #2A2E4A;border-radius:14px;padding:14px 16px}
+.sec-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6B7099;margin:20px 16px 10px}
+
+/* ── TOGGLE ── */
+.tog{display:flex;background:#1A1D2E;border-radius:10px;padding:3px;gap:3px}
+.tog-btn{flex:1;padding:10px;border-radius:8px;border:none;font-weight:600;font-size:13px;background:transparent;color:#6B7099;transition:all .15s}
+.tog-btn.active{background:#5B6AF0;color:#fff}
+
+/* ── PILL ── */
+.pill{padding:7px 13px;border-radius:20px;border:1.5px solid #2A2E4A;background:transparent;color:#6B7099;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+
+/* ── BTN ── */
+.btn-primary{width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,#5B6AF0,#A78BFA);color:#fff;font-weight:700;font-size:15px;margin-top:8px}
+.btn-ghost{padding:13px;border-radius:12px;border:1px solid #2A2E4A;background:transparent;color:#6B7099;font-weight:700;font-size:14px;flex:1}
+.btn-danger{padding:13px;border-radius:12px;border:none;background:#E07A5F;color:#fff;font-weight:700;font-size:14px;flex:1}
+.btn-archive{padding:13px;border-radius:12px;border:none;background:#A78BFA;color:#fff;font-weight:700;font-size:14px;flex:1}
+.btn-icon{background:#252840;border:1px solid #2A2E4A;border-radius:7px;padding:4px 9px;font-size:11px;color:#A78BFA;font-weight:600}
+.btn-icon.red{color:#E07A5F}
+.btn-icon.green{color:#81B29A}
+.back-btn{background:none;border:none;color:#6B7099;font-size:22px}
+
+/* ── TX ROW ── */
+.tx-row{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #141620}
+.tx-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
+.tx-meta{flex:1;min-width:0}
+.tx-name{font-size:13px;font-weight:500;color:#E8E8F0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:11px;color:#6B7099;margin-top:1px}
+.tx-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;margin-left:6px}
+.tx-actions{display:flex;gap:4px}
+
+/* ── SOBRE CARD ── */
+.sobre-card{background:#1A1D2E;border-radius:16px;border:1px solid #2A2E4A;margin:0 16px 12px;padding:16px}
+.sobre-card.warn{border-color:#F2CC8F33}
+.sobre-card.over{border-color:#E07A5F44}
+.sobre-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sobre-info{display:flex;align-items:center;gap:10px}
+.sobre-emoji{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.sobre-name{font-size:14px;font-weight:700}
+.sobre-cur{font-size:11px;color:#6B7099}
+.sobre-btns{display:flex;gap:6px}
+.progress-bar{height:6px;background:#2A2E4A;border-radius:3px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.sobre-bottom{display:flex;justify-content:space-between;align-items:flex-end}
+.sobre-bal{font-size:16px;font-weight:700}
+.sobre-bal-label{font-size:11px;color:#6B7099}
+.sobre-tx{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #141620;margin-top:6px}
+.sobre-tx-note{font-size:12px;color:#A0A0C0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sobre-tx-amt{font-size:12px;color:#E07A5F;flex-shrink:0;margin-left:8px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.bottom{align-items:flex-end;justify-content:center;padding:0}
+.modal-box{background:#1A1D2E;border-radius:20px;width:100%;max-width:360px;padding:24px;border:1px solid #2A2E4A}
+.modal-sheet{background:#1A1D2E;border-radius:20px 20px 0 0;width:100%;max-width:420px;padding:24px 20px 40px;border:1px solid #2A2E4A;max-height:90vh;overflow-y:auto}
+.modal-row{display:flex;gap:10px;margin-top:16px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:4px}
+
+/* ── EMOJI GRID ── */
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;padding:10px 0;margin-bottom:6px}
+.emoji-btn{font-size:20px;background:transparent;border:none;border-radius:8px;padding:4px;cursor:pointer;aspect-ratio:1}
+.emoji-btn.sel{background:#252840}
+
+/* ── COLOR GRID ── */
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.color-dot{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.color-dot.sel{border-color:#fff}
+
+/* ── SCREEN ── */
+.screen{display:none;padding-bottom:8px}
+.screen.active{display:block}
+.screen-header{display:flex;align-items:center;gap:12px;padding:24px 16px 12px}
+.screen-title{font-size:17px;font-weight:700}
+
+/* ── MISC ── */
+.row{display:flex;align-items:center}
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:11px;color:#6B7099;padding:8px 12px;background:#1A1D2E;border-radius:8px;margin-top:8px}
+.empty{padding:24px;text-align:center;color:#6B7099;font-size:14px}
+.check-row{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer}
+.check-box{width:20px;height:20px;border-radius:6px;border:2px solid #2A2E4A;background:transparent;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+.check-box.checked{background:#5B6AF0;border-color:#5B6AF0}
+.logout-btn{background:none;border:none;color:#6B7099;font-size:12px;padding:4px 8px;border-radius:6px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B7099}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:#0F1117;display:flex;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:12px}
+.spinner{width:32px;height:32px;border:3px solid #2A2E4A;border-top-color:#5B6AF0;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.archived-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #141620;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading"><div class="spinner"></div><div style="font-size:13px;color:#6B7099">Cargando...</div></div>
+
+<!-- AUTH -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-logo">💼</div>
+  <div class="auth-title">Mi Billetera</div>
+  <div class="auth-sub">Controla tus finanzas en USD y COP</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" onclick="switchTab('register')">Registrarse</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div class="field"><label>Correo electrónico</label><input class="inp" id="auth-email" type="email" placeholder="correo@ejemplo.com"/></div>
+    <div class="field"><label>Contraseña</label><input class="inp" id="auth-pass" type="password" placeholder="••••••••"/></div>
+    <button class="auth-btn" id="auth-submit-btn" onclick="submitAuth()">Iniciar sesión</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div id="screen-dashboard" class="screen active">
+    <div style="padding:28px 16px 12px;background:linear-gradient(180deg,#1A1D2E,#0F1117)">
+      <div class="row-between" style="margin-bottom:12px">
+        <div class="tag">Mi Billetera</div>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesión ↪</button>
+      </div>
+      <div class="card-grad">
+        <div class="tag" style="margin-bottom:4px">Efectivo total en COP</div>
+        <div id="d-total-cop" style="font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1">$0 COP</div>
+        <div id="d-total-usd" style="font-size:13px;color:#6B7099;margin-top:4px">≈ $0.00 USD · Tasa ref: $4,100/USD</div>
+      </div>
+    </div>
+    <div class="grid2" style="margin:0 16px 16px">
+      <div class="mini-card"><div class="tag">💵 Dólares</div><div id="d-usd" style="font-size:18px;font-weight:700;margin-top:4px">$0.00</div></div>
+      <div class="mini-card"><div class="tag">🏦 Pesos</div><div id="d-cop" style="font-size:15px;font-weight:700;margin-top:4px">$0 COP</div></div>
+    </div>
+    <div class="card" style="margin:0 16px 16px;padding:10px 14px" id="rate-bar">
+      <div class="row-between">
+        <span style="font-size:12px;color:#6B7099">Tasa referencia USD→COP</span>
+        <input class="inp" id="rate-input" type="number" style="width:110px;padding:6px 10px;font-size:13px;text-align:right" oninput="updateRate(this.value)"/>
+      </div>
+    </div>
+    <div class="grid2" style="margin:0 16px 16px">
+      <button onclick="goScreen('ingreso')" style="padding:14px;border-radius:12px;border:1px solid #2D6A4F55;background:#2D6A4F22;color:#81B29A;font-weight:700;font-size:13px">↓ Registrar ingreso</button>
+      <button onclick="goScreen('exchange')" style="padding:14px;border-radius:12px;border:1px solid #2A2E4A;background:#1A1D2E;color:#F2CC8F;font-weight:700;font-size:13px">↔ Cambiar divisas</button>
+    </div>
+    <div class="sec-title">Últimas transacciones</div>
+    <div class="card" style="margin:0 16px;overflow:hidden">
+      <div id="d-txlist"></div>
+    </div>
+  </div>
+
+  <!-- SOBRES -->
+  <div id="screen-sobres" class="screen">
+    <div style="padding:24px 16px 0">
+      <div class="row-between" style="margin-bottom:16px">
+        <span class="screen-title" style="padding:0">Sobres</span>
+        <div class="row" style="gap:8px">
+          <button class="btn-icon" onclick="goScreen('transfer')" style="padding:7px 12px;font-size:12px">⇄ Mover</button>
+          <button onclick="openNewSobre()" style="padding:7px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#5B6AF0,#A78BFA);color:#fff;font-size:12px;font-weight:700">+ Nuevo</button>
+        </div>
+      </div>
+    </div>
+    <div id="sobres-list"></div>
+    <div id="archived-section" style="display:none">
+      <div class="sec-title">Archivados</div>
+      <div class="card" style="margin:0 16px;overflow:hidden" id="archived-list"></div>
+    </div>
+    <div style="margin:4px 16px 20px">
+      <button onclick="openNewSobre()" style="width:100%;padding:13px;border-radius:12px;border:1px dashed #2A2E4A;background:transparent;color:#6B7099;font-size:14px;font-weight:600">+ Nueva categoría</button>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="screen-history" class="screen">
+    <div class="row-between screen-header">
+      <span class="screen-title">Historial</span>
+      <span style="font-size:12px;color:#6B7099">✏️ editar · 🗑 eliminar</span>
+    </div>
+    <div class="card" style="margin:0 16px;overflow:hidden"><div id="hist-list"></div></div>
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- INGRESO -->
+  <div id="screen-ingreso" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <span class="screen-title" id="ingreso-title">Registrar ingreso</span>
+    </div>
+    <div style="padding:0 16px">
+      <div class="field"><label>Monto recibido</label>
+        <div class="row" style="gap:8px">
+          <input class="inp" id="ing-amount" type="number" placeholder="0" style="flex:1"/>
+          <div class="tog">
+            <button class="tog-btn active" onclick="setToggle('ing-cur','USD',this)">USD</button>
+            <button class="tog-btn" onclick="setToggle('ing-cur','COP',this)">COP</button>
+          </div>
+        </div>
+        <input type="hidden" id="ing-cur" value="USD"/>
+      </div>
+      <div class="field"><label>Nota (opcional)</label><input class="inp" id="ing-note" placeholder="Ej: Pago cliente"/></div>
+      <div class="hint">💡 Luego ve a <b>Sobres</b> y asigna el monto a cada categoría.</div>
+      <button class="btn-primary" id="ing-btn" onclick="saveIngreso()">Registrar ingreso</button>
+    </div>
+  </div>
+
+  <!-- GASTO -->
+  <div id="screen-addGasto" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="cancelGasto()">←</button>
+      <span class="screen-title" id="gasto-title">Registrar gasto</span>
+    </div>
+    <div style="padding:0 16px">
+      <div class="field"><label>Sobre</label><div id="sobre-pills" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"></div></div>
+      <div id="sobre-bal-box" style="display:none;margin-top:8px" class="card" style="padding:10px 14px;background:#252840"></div>
+      <div class="check-row" onclick="toggleMixed()">
+        <div class="check-box" id="mixed-check"></div>
+        <span style="font-size:13px;color:#A0A0C0">Pagué en USD y recibí vuelto mixto</span>
+      </div>
+      <div id="mixed-fields" style="display:none">
+        <div class="field"><label>Pagué (USD)</label><input class="inp" id="g-paidUSD" type="number" placeholder="Ej: 20"/></div>
+        <div class="field"><label>Vuelto en USD</label><input class="inp" id="g-changeUSD" type="number" placeholder="Ej: 2"/></div>
+        <div class="field"><label>Vuelto en COP</label><input class="inp" id="g-changeCOP" type="number" placeholder="Ej: 15000"/></div>
+        <div class="field"><label>Tasa usada en tienda</label><input class="inp" id="g-rate" type="number" placeholder="Ej: 4100"/></div>
+        <div id="costo-real-box" style="display:none;background:#252840;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:12px;color:#A0A0C0"></div>
+      </div>
+      <div id="simple-fields">
+        <div class="field"><label>Monto</label>
+          <div class="row" style="gap:8px">
+            <input class="inp" id="g-amount" type="number" placeholder="0" style="flex:1"/>
+            <div class="tog">
+              <button class="tog-btn active" onclick="setToggle('g-cur','COP',this)">COP</button>
+              <button class="tog-btn" onclick="setToggle('g-cur','USD',this)">USD</button>
+            </div>
+          </div>
+          <input type="hidden" id="g-cur" value="COP"/>
+        </div>
+      </div>
+      <div class="field"><label>Nota (opcional)</label><input class="inp" id="g-note" placeholder="Ej: Mercado semanal"/></div>
+      <button class="btn-primary" id="gasto-btn" onclick="saveGasto()">Registrar gasto</button>
+    </div>
+  </div>
+
+  <!-- EXCHANGE -->
+  <div id="screen-exchange" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="cancelCambio()">←</button>
+      <span class="screen-title" id="exchange-title">Cambiar divisas</span>
+    </div>
+    <div style="padding:0 16px">
+      <div class="card" style="padding:14px;margin-bottom:4px">
+        <div style="font-size:12px;color:#6B7099;margin-bottom:4px">Efectivo disponible</div>
+        <div id="ex-available" style="font-size:15px;font-weight:600"></div>
+      </div>
+      <div class="field"><label>Dólares que cambias</label><input class="inp" id="ex-usd" type="number" placeholder="Ej: 50" oninput="calcExchange('usd')"/></div>
+      <div class="field"><label>Tasa que te dan</label><input class="inp" id="ex-rate" type="number" oninput="calcExchange('rate')"/></div>
+      <div class="field"><label>Pesos que recibes</label><input class="inp" id="ex-cop" type="number" placeholder="Ej: 210000" oninput="calcExchange('cop')"/></div>
+      <div id="ex-result" style="display:none;background:#2D6A4F22;border:1px solid #2D6A4F;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:13px;color:#81B29A"></div>
+      <button class="btn-primary" id="exchange-btn" onclick="saveCambio()" style="margin-top:16px">Registrar cambio</button>
+    </div>
+  </div>
+
+  <!-- TRANSFER -->
+  <div id="screen-transfer" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goScreen('sobres')">←</button>
+      <span class="screen-title" id="transfer-title">Mover entre sobres</span>
+    </div>
+    <div style="padding:0 16px">
+      <div class="card" style="padding:10px 14px;margin-bottom:8px">
+        <div style="font-size:12px;color:#6B7099">ℹ️ Mueve saldo asignado entre sobres sin afectar el efectivo.</div>
+      </div>
+      <div class="field"><label>Desde</label><select class="inp" id="xfer-from" onchange="renderXferTo()"></select></div>
+      <div class="field"><label>Hacia</label><select class="inp" id="xfer-to"></select></div>
+      <div class="field"><label>Monto</label><input class="inp" id="xfer-amount" type="number" placeholder="0"/></div>
+      <div class="field"><label>Nota (opcional)</label><input class="inp" id="xfer-note" placeholder="Ej: Sobrante de comida"/></div>
+      <button class="btn-primary" id="xfer-btn" onclick="saveXfer()">Confirmar</button>
+    </div>
+  </div>
+
+  <!-- ARCHIVED VIEW (fullscreen overlay) -->
+  <div id="archived-view" style="display:none;position:fixed;inset:0;background:#0F1117;z-index:150;overflow-y:auto;padding-bottom:40px">
+    <div class="screen-header">
+      <button class="back-btn" onclick="closeArchivedView()">←</button>
+      <div><div id="av-title" style="font-size:17px;font-weight:700"></div><div id="av-date" style="font-size:12px;color:#6B7099"></div></div>
+    </div>
+    <div class="grid2" style="margin:0 16px 16px">
+      <div class="mini-card"><div class="tag">Asignado</div><div id="av-assigned" style="font-size:16px;font-weight:700;margin-top:2px"></div></div>
+      <div class="mini-card"><div class="tag">Gastado</div><div id="av-spent" style="font-size:16px;font-weight:700;color:#E07A5F;margin-top:2px"></div></div>
+    </div>
+    <div class="card" style="margin:0 16px;overflow:hidden"><div id="av-txlist"></div></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODALS -->
+
+<!-- Delete confirm -->
+<div id="modal-delete" class="modal-overlay" style="display:none" onclick="closeDeleteModal(event)">
+  <div class="modal-box">
+    <div style="font-size:28px;text-align:center;margin-bottom:12px">⚠️</div>
+    <div style="font-size:16px;font-weight:700;text-align:center;margin-bottom:8px">¿Seguro que quieres eliminar?</div>
+    <div style="background:#252840;border-radius:12px;padding:12px 14px;margin-bottom:8px">
+      <div id="del-title" style="font-size:14px;font-weight:600;color:#E8E8F0"></div>
+      <div id="del-sub" style="font-size:12px;color:#6B7099;margin-top:2px"></div>
+    </div>
+    <div style="font-size:12px;color:#6B7099;text-align:center;margin-bottom:20px">Esta acción revertirá los valores automáticamente.</div>
+    <div class="modal-row">
+      <button class="btn-ghost" onclick="closeDeleteModal()">Cancelar</button>
+      <button class="btn-danger" onclick="confirmDelete()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign -->
+<div id="modal-assign" class="modal-overlay bottom" style="display:none" onclick="closeAssignModal(event)">
+  <div class="modal-sheet">
+    <div id="assign-title" class="modal-title"></div>
+    <div style="font-size:12px;color:#6B7099;margin-bottom:4px">El efectivo no cambia hasta que registres un gasto.</div>
+    <div class="field"><label id="assign-cur-label">Monto (COP)</label><input class="inp" id="assign-amount" type="number" placeholder="0"/></div>
+    <div class="modal-row">
+      <button class="btn-ghost" onclick="closeAssignModal()">Cancelar</button>
+      <button class="btn-primary" style="margin-top:0" onclick="saveAsign()">Asignar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Archive confirm -->
+<div id="modal-archive" class="modal-overlay" style="display:none" onclick="closeArchiveModal(event)">
+  <div class="modal-box">
+    <div style="font-size:22px;text-align:center;margin-bottom:8px">📁</div>
+    <div id="arch-title" style="font-size:16px;font-weight:700;text-align:center;margin-bottom:8px"></div>
+    <div id="arch-sub" style="font-size:13px;color:#6B7099;text-align:center;margin-bottom:20px"></div>
+    <div class="modal-row">
+      <button class="btn-ghost" onclick="closeArchiveModal()">Cancelar</button>
+      <button class="btn-archive" onclick="confirmArchive()">Archivar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sobre editor -->
+<div id="modal-sobre" class="modal-overlay bottom" style="display:none" onclick="closeSobreModal(event)">
+  <div class="modal-sheet">
+    <div id="sobre-modal-title" class="modal-title" style="margin-bottom:20px"></div>
+    <div class="field" style="margin-top:0"><label>Ícono</label>
+      <button onclick="toggleEmojiPicker()" id="emoji-preview-btn" style="font-size:26px;background:#252840;border:1px solid #2A2E4A;border-radius:12px;padding:8px 16px;margin-bottom:6px">📦 <span style="font-size:12px;color:#6B7099">▼</span></button>
+      <div id="emoji-picker" class="emoji-grid" style="display:none"></div>
+    </div>
+    <div class="field"><label>Nombre</label><input class="inp" id="sobre-name" placeholder="Ej: Mercado"/></div>
+    <div class="field"><label>Moneda del sobre</label>
+      <div class="tog">
+        <button class="tog-btn active" onclick="setSobreCur('COP',this)">🏦 Pesos</button>
+        <button class="tog-btn" onclick="setSobreCur('USD',this)">💵 Dólares</button>
+      </div>
+      <input type="hidden" id="sobre-cur" value="COP"/>
+    </div>
+    <div class="field"><label>Color</label><div class="color-grid" id="color-grid"></div></div>
+    <input type="hidden" id="sobre-color" value="#E07A5F"/>
+    <div class="modal-row">
+      <button class="btn-ghost" onclick="closeSobreModal()">Cancelar</button>
+      <button id="sobre-del-btn" style="display:none;padding:13px;border-radius:12px;border:none;background:#E07A5F22;color:#E07A5F;font-weight:700;font-size:14px" onclick="deleteSobre()">🗑️</button>
+      <button class="btn-primary" style="margin-top:0;flex:1" onclick="saveSobre()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn active" onclick="goScreen('dashboard')" id="nav-dashboard"><span class="nav-icon">⌂</span>Inicio</button>
+  <button class="nav-btn" onclick="goScreen('sobres')" id="nav-sobres"><span class="nav-icon">🗂</span>Sobres</button>
+  <button class="nav-btn" onclick="openAddGasto()" id="nav-addGasto"><div class="fab">+</div></button>
+  <button class="nav-btn" onclick="goScreen('history')" id="nav-history"><span class="nav-icon">☰</span>Historial</button>
+  <button class="nav-btn" onclick="goScreen('exchange')" id="nav-exchange"><span class="nav-icon">↔</span>Cambiar</button>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// ── FIREBASE INIT ──────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBXf12aYw9UloKeOljKLx1Ag0kOkba94Ko",
+  authDomain: "app-de-finanzas-5aa2e.firebaseapp.com",
+  databaseURL: "https://app-de-finanzas-5aa2e-default-rtdb.firebaseio.com",
+  projectId: "app-de-finanzas-5aa2e",
+  storageBucket: "app-de-finanzas-5aa2e.firebasestorage.app",
+  messagingSenderId: "394145951479",
+  appId: "1:394145951479:web:b5a9621a793f1054e2adf2"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let uid = null;
+let state = {
+  cash: { usd:0, cop:0 },
+  exchangeRate: 4100,
+  sobres: {},
+  archivedSobres: {},
+  transactions: {}
+};
+
+const CAT_COLORS = ["#E07A5F","#5B8DEF","#81B29A","#F2CC8F","#A78BFA","#A8DADC","#2D6A4F","#E07AAF","#F4A261","#6B9080","#C77DFF","#4CC9F0","#F72585","#7B9E87","#FFB347"];
+const EMOJIS = ["🍽️","🍕","🍔","🥗","☕","🧃","🍺","🛒","🚌","🚗","✈️","🚇","⛽","🛵","🚕","🚲","💡","📱","💻","🏠","🔧","🛁","📺","🖥️","🏥","💊","🩺","🧘","🏋️","💆","🦷","👁️","🎬","🎮","🎵","📚","🎨","🎭","🏖️","🎲","👕","👗","👟","👜","💄","🧴","💍","🕶️","💰","🏦","📈","💳","🧾","💸","🪙","🎁","🐾","🌱","⚽","🎓","🏡","🧹","📦","✨"];
+const DEFAULT_SOBRES = [
+  {id:"alquiler",  name:"Alquiler",       emoji:"🏠",color:"#5B8DEF",currency:"USD",assigned:0,spent:0,openedAt:now()},
+  {id:"internet",  name:"Internet",        emoji:"💻",color:"#81B29A",currency:"USD",assigned:0,spent:0,openedAt:now()},
+  {id:"colegio",   name:"Colegio",         emoji:"🎓",color:"#A78BFA",currency:"USD",assigned:0,spent:0,openedAt:now()},
+  {id:"comida",    name:"Comida",          emoji:"🍽️",color:"#E07A5F",currency:"COP",assigned:0,spent:0,openedAt:now()},
+  {id:"transporte",name:"Transporte",      emoji:"🚌",color:"#F4A261",currency:"COP",assigned:0,spent:0,openedAt:now()},
+  {id:"servicios", name:"Servicios",       emoji:"💡",color:"#6B9080",currency:"COP",assigned:0,spent:0,openedAt:now()},
+  {id:"otro",      name:"Otro",            emoji:"📦",color:"#999",   currency:"COP",assigned:0,spent:0,openedAt:now()},
+];
+
+// edit state
+let editingIngresoId=null, editingCambioId=null, editingXferId=null, editingAsignId=null, editingGastoId=null;
+let currentSobreId=null, currentScreen='dashboard', deleteTargetId=null, archiveTargetId=null, editSobreId=null;
+let isMixed=false, sobreEmoji="📦", sobreColor="#E07A5F", gastoCurr="COP";
+let backScreen='dashboard';
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function now(){ return new Date().toISOString(); }
+function fmt(n,cur){
+  n=Number(n)||0;
+  if(cur==="USD") return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+  return "$"+n.toLocaleString("es-CO",{minimumFractionDigits:0,maximumFractionDigits:0})+" COP";
+}
+function fmtDT(iso){
+  try{ return new Date(iso).toLocaleString("es-CO",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); }
+  catch(e){ return ""; }
+}
+function uid_path(p){ return `usuarios/${uid}/${p}`; }
+function dbSet(path,val){ return db.ref(uid_path(path)).set(val); }
+function dbUpdate(path,val){ return db.ref(uid_path(path)).update(val); }
+function dbPush(path,val){ return db.ref(uid_path(path)).push(val); }
+function dbRemove(path){ return db.ref(uid_path(path)).remove(); }
+function objToArr(obj){ return obj ? Object.entries(obj).map(([k,v])=>({...v,_key:k})) : []; }
+
+function sobreBal(s){ return (s.assigned||0)-(s.spent||0); }
+function calcCashDelta(f,rate){
+  if(f.isMixed){
+    return { deltaUSD:-(parseFloat(f.paidUSD)||0)+(parseFloat(f.changeUSD)||0), deltaCOP:parseFloat(f.changeCOP)||0 };
+  }
+  if(f.currency==="USD") return { deltaUSD:-(parseFloat(f.amount)||0), deltaCOP:0 };
+  return { deltaUSD:0, deltaCOP:-(parseFloat(f.amount)||0) };
+}
+function calcGastoCost(f,sobreCur,rate){
+  const r=parseFloat(f.rateUsed||rate)||rate;
+  if(f.isMixed){
+    const paid=parseFloat(f.paidUSD)||0, chUSD=parseFloat(f.changeUSD)||0, chCOP=parseFloat(f.changeCOP)||0;
+    if(sobreCur==="USD") return paid-chUSD-chCOP/r;
+    return (paid-chUSD)*r-chCOP;
+  }
+  const amt=parseFloat(f.amount)||0;
+  if(f.currency==="USD") return sobreCur==="USD"?amt:amt*r;
+  return sobreCur==="COP"?amt:amt/r;
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+let currentTab='login';
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.auth-tab').forEach((b,i)=>b.classList.toggle('active',(tab==='login'?i===0:i===1)));
+  document.getElementById('auth-submit-btn').textContent=tab==='login'?'Iniciar sesión':'Registrarse';
+  document.getElementById('auth-error').style.display='none';
+}
+function showAuthError(msg){ const e=document.getElementById('auth-error'); e.textContent=msg; e.style.display='block'; }
+function submitAuth(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  if(!email||!pass){ showAuthError("Completa todos los campos."); return; }
+  const btn=document.getElementById('auth-submit-btn');
+  btn.textContent="..."; btn.disabled=true;
+  const p=currentTab==='login'?auth.signInWithEmailAndPassword(email,pass):auth.createUserWithEmailAndPassword(email,pass);
+  p.catch(err=>{ showAuthError(err.message); btn.textContent=currentTab==='login'?'Iniciar sesión':'Registrarse'; btn.disabled=false; });
+}
+function doLogout(){ auth.signOut(); }
+
+// ── FIREBASE DATA LISTENER ────────────────────────────────────────────────
+let dataListener=null;
+function startListening(){
+  if(dataListener) dataListener();
+  const ref=db.ref(`usuarios/${uid}`);
+  ref.on('value',snap=>{
+    const data=snap.val()||{};
+    state.cash=data.cash||{usd:0,cop:0};
+    state.exchangeRate=data.exchangeRate||4100;
+    state.sobres=data.sobres||{};
+    state.archivedSobres=data.archivedSobres||{};
+    state.transactions=data.transactions||{};
+    // seed default sobres
+    if(!data.sobres){
+      const s={};
+      DEFAULT_SOBRES.forEach(x=>{ s[x.id]={...x}; });
+      dbSet('sobres',s);
+    }
+    renderAll();
+  });
+  dataListener=()=>ref.off('value');
+}
+function stopListening(){ if(dataListener){ dataListener(); dataListener=null; } }
+
+// ── AUTH STATE ────────────────────────────────────────────────────────────
+auth.onAuthStateChanged(user=>{
+  document.getElementById('loading').style.display='none';
+  if(user){
+    uid=user.uid;
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('nav').style.display='flex';
+    startListening();
+  } else {
+    uid=null;
+    stopListening();
+    document.getElementById('app').style.display='none';
+    document.getElementById('nav').style.display='none';
+    document.getElementById('auth-screen').style.display='flex';
+  }
+});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function goScreen(id, back){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById('screen-'+id);
+  if(s){ s.classList.add('active'); }
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nav-'+id);
+  if(nb) nb.classList.add('active');
+  currentScreen=id;
+  backScreen=back||'dashboard';
+  if(id==='exchange') renderExchangeScreen();
+  if(id==='sobres') renderSobres();
+  if(id==='history') renderHistory();
+  if(id==='transfer') renderTransferScreen();
+  if(id==='dashboard') renderDashboard();
+}
+function goBack(){ goScreen(backScreen); }
+
+// ── RENDER ALL ────────────────────────────────────────────────────────────
+function renderAll(){
+  renderDashboard();
+  if(currentScreen==='sobres') renderSobres();
+  if(currentScreen==='history') renderHistory();
+  if(currentScreen==='addGasto') renderSobrePills();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const rate=state.exchangeRate||4100;
+  const usd=state.cash.usd||0, cop=state.cash.cop||0;
+  const totalCOP=cop+usd*rate, totalUSD=usd+cop/rate;
+  document.getElementById('d-total-cop').textContent=fmt(totalCOP,'COP');
+  document.getElementById('d-total-usd').textContent=`≈ ${fmt(totalUSD,'USD')} · Tasa ref: $${Number(rate).toLocaleString('es-CO')}/USD`;
+  document.getElementById('d-usd').textContent=fmt(usd,'USD');
+  document.getElementById('d-cop').textContent=fmt(cop,'COP');
+  document.getElementById('rate-input').value=rate;
+  // tx list
+  const txs=objToArr(state.transactions).sort((a,b)=>b.registeredAt?.localeCompare(a.registeredAt));
+  const el=document.getElementById('d-txlist');
+  el.innerHTML=txs.length===0?'<div class="empty">Sin transacciones aún.<br>Presiona + para agregar.</div>':'';
+  txs.slice(0,8).forEach(tx=>el.appendChild(makeTxRow(tx,false)));
+  if(txs.length>8){
+    const more=document.createElement('div');
+    more.style.cssText='padding:10px 16px;font-size:12px;color:#5B6AF0;text-align:center;cursor:pointer';
+    more.textContent=`Ver todas (${txs.length})`;
+    more.onclick=()=>goScreen('history');
+    el.appendChild(more);
+  }
+}
+function updateRate(v){ const r=parseFloat(v)||4100; dbSet('exchangeRate',r); }
+
+// ── SOBRES ────────────────────────────────────────────────────────────────
+function renderSobres(){
+  const list=document.getElementById('sobres-list');
+  list.innerHTML='';
+  const sobresArr=objToArr(state.sobres);
+  if(sobresArr.length===0) list.innerHTML='<div class="empty">No hay sobres abiertos.</div>';
+  sobresArr.forEach(s=>list.appendChild(makeSobreCard(s)));
+
+  const archived=objToArr(state.archivedSobres);
+  const sec=document.getElementById('archived-section');
+  const aList=document.getElementById('archived-list');
+  aList.innerHTML='';
+  sec.style.display=archived.length>0?'block':'none';
+  archived.sort((a,b)=>(b.archivedAt||'').localeCompare(a.archivedAt||'')).forEach(s=>{
+    const row=document.createElement('div');
+    row.className='archived-row';
+    row.innerHTML=`<div style="width:34px;height:34px;border-radius:9px;background:${s.color||'#999'}22;display:flex;align-items:center;justify-content:center;font-size:16px">${s.emoji||'📦'}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${s.name}</div><div style="font-size:11px;color:#6B7099">Archivado ${fmtDT(s.archivedAt)} · Gastado ${fmt(s.spent||0,s.currency||'COP')}</div></div>
+      <span style="color:#6B7099">›</span>`;
+    row.onclick=()=>openArchivedView(s);
+    aList.appendChild(row);
+  });
+}
+
+function makeSobreCard(s){
+  const bal=sobreBal(s);
+  const pct=s.assigned>0?Math.min(100,(s.spent||0)/s.assigned*100):0;
+  const low=bal>0&&bal<s.assigned*0.2;
+  const over=bal<0;
+  const empty=!s.assigned;
+  const card=document.createElement('div');
+  card.className='sobre-card'+(over?' over':low?' warn':'');
+
+  const txsOfSobre=objToArr(state.transactions).filter(t=>t.sobreId===s._key&&t.type==='gasto')
+    .sort((a,b)=>b.registeredAt?.localeCompare(a.registeredAt)).slice(0,2);
+
+  const archBtn=(!empty)? `<button onclick="openArchiveModal('${s._key}')" style="background:${bal<=0||over?'#252840':'transparent'};border:${bal<=0||over?'1px solid #2A2E4A':'none'};border-radius:8px;padding:5px 10px;color:${bal<=0||over?'#A78BFA':'#3A3E5A'};font-size:11px;font-weight:700;cursor:pointer">${bal<=0||over?'📁 Archivar':'Archivar'}</button>` :'';
+
+  card.innerHTML=`
+    <div class="sobre-top">
+      <div class="sobre-info">
+        <div class="sobre-emoji" style="background:${s.color||'#999'}22">${s.emoji||'📦'}</div>
+        <div><div class="sobre-name">${s.name}</div><div class="sobre-cur">${s.currency==='USD'?'💵 Dólares':'🏦 Pesos'}</div></div>
+      </div>
+      <div class="sobre-btns">
+        <button class="btn-icon green" style="padding:5px 10px;font-size:12px" onclick="openAssignModal('${s._key}',null)">+ Asignar</button>
+        <button class="btn-icon" onclick="openEditSobre('${s._key}')">✏️</button>
+      </div>
+    </div>
+    ${empty?`<div style="font-size:13px;color:#6B7099;padding:8px 0">Sin asignación · toca <b style="color:#81B29A">+ Asignar</b> para cargar este sobre</div>`:`
+      <div class="row-between" style="font-size:12px;color:#6B7099;margin-bottom:6px">
+        <span>Gastado: <b style="color:${over?'#E07A5F':'#E8E8F0'}">${fmt(s.spent||0,s.currency||'COP')}</b></span>
+        <span>de ${fmt(s.assigned||0,s.currency||'COP')}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${over?'#E07A5F':low?'#F2CC8F':s.color||'#999'}"></div></div>
+      <div class="sobre-bottom">
+        <div><div class="sobre-bal" style="color:${over?'#E07A5F':low?'#F2CC8F':'#81B29A'}">${fmt(Math.abs(bal),s.currency||'COP')}</div>
+          <div class="sobre-bal-label">${over?'excedido':bal<=0?'agotado':'disponible'}</div></div>
+        ${archBtn}
+      </div>
+      ${txsOfSobre.map(tx=>`<div class="sobre-tx"><span class="sobre-tx-note">${tx.note||'Gasto'}</span><span class="sobre-tx-amt">${tx.isMixed?`-${fmt(parseFloat(tx.paidUSD||0),'USD')}`:`-${fmt(parseFloat(tx.amount||0),tx.currency||'COP')}`}</span></div>`).join('')}
+    `}`;
+  return card;
+}
+
+// ── TX ROW ────────────────────────────────────────────────────────────────
+function makeTxRow(tx, showEdit){
+  const sobresMap={};
+  objToArr(state.sobres).forEach(s=>sobresMap[s._key]=s);
+  const s=sobresMap[tx.sobreId]||{emoji:'📦',name:'Otro',color:'#999',currency:'COP'};
+  const row=document.createElement('div');
+  row.className='tx-row';
+
+  let icon='', amtHtml='';
+  const type=tx.type||'';
+  if(type==='cambio'){
+    icon='↔';
+    amtHtml=`<span style="color:#F2CC8F;font-size:12px">↔ ${fmt(Math.abs(tx.deltaUSD||0),'USD')} → ${fmt(tx.deltaCOP||0,'COP')}</span>`;
+  } else if(type==='ingreso'){
+    icon='↓';
+    amtHtml=`<span style="color:#81B29A;font-size:13px;font-weight:700">+${fmt(parseFloat(tx.amount||0),tx.currency||'USD')}</span>`;
+  } else if(type==='asignacion'){
+    icon='→';
+    amtHtml=`<span style="color:#A78BFA;font-size:12px">+${fmt(tx.amount||0,tx.currency||s.currency||'COP')} → ${s.emoji}</span>`;
+  } else if(type==='transferencia_salida'){
+    icon='⇄';
+    amtHtml=`<span style="color:#E07A5F;font-size:12px">-${fmt(tx.amount||0,tx.currency||s.currency||'COP')}</span>`;
+  } else if(type==='transferencia_entrada'){
+    icon='⇄';
+    amtHtml=`<span style="color:#81B29A;font-size:12px">+${fmt(tx.amount||0,tx.currency||s.currency||'COP')}</span>`;
+  } else if(type==='gasto'){
+    icon=s.emoji||'📦';
+    if(tx.isMixed){
+      amtHtml=`<div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+        <span style="font-size:13px;font-weight:700;color:#E07A5F">-${fmt(parseFloat(tx.paidUSD||0),'USD')}</span>
+        ${parseFloat(tx.changeCOP||0)>0?`<span style="font-size:11px;color:#81B29A">+${fmt(parseFloat(tx.changeCOP),'COP')}</span>`:''}
+        ${parseFloat(tx.changeUSD||0)>0?`<span style="font-size:11px;color:#81B29A">+${fmt(parseFloat(tx.changeUSD),'USD')}</span>`:''}
+      </div>`;
+    } else {
+      amtHtml=`<span style="font-size:13px;font-weight:700;color:#E07A5F">-${fmt(parseFloat(tx.amount||0),tx.currency||'COP')}</span>`;
+    }
+  }
+
+  const editBtns=showEdit?`<div class="tx-actions">
+    <button class="btn-icon" onclick="openEdit('${tx._key}')">✏️</button>
+    <button class="btn-icon red" onclick="openDeleteModal('${tx._key}')">🗑</button>
+  </div>`:'';
+
+  row.innerHTML=`
+    <div class="tx-icon" style="background:${(s.color||'#999')}22">${icon}</div>
+    <div class="tx-meta">
+      <div class="tx-name">${tx.note||`${s.emoji||''} ${s.name||''}`}</div>
+      <div class="tx-date">${fmtDT(tx.registeredAt)}${tx.editedAt?' · editado':''}</div>
+    </div>
+    <div class="tx-right">${amtHtml}${editBtns}</div>`;
+  return row;
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────────
+function renderHistory(){
+  const txs=objToArr(state.transactions).sort((a,b)=>b.registeredAt?.localeCompare(a.registeredAt));
+  const el=document.getElementById('hist-list');
+  el.innerHTML=txs.length===0?'<div class="empty">Sin transacciones</div>':'';
+  txs.forEach(tx=>el.appendChild(makeTxRow(tx,true)));
+}
+
+// ── INGRESO ───────────────────────────────────────────────────────────────
+function saveIngreso(){
+  const amt=parseFloat(document.getElementById('ing-amount').value)||0;
+  if(!amt) return;
+  const cur=document.getElementById('ing-cur').value;
+  const note=document.getElementById('ing-note').value||'Ingreso';
+  const deltaUSD=cur==='USD'?amt:0, deltaCOP=cur==='COP'?amt:0;
+
+  if(editingIngresoId){
+    const old=state.transactions[editingIngresoId];
+    const updates={};
+    updates[`cash/usd`]=(state.cash.usd||0)-(old.deltaUSD||0)+deltaUSD;
+    updates[`cash/cop`]=(state.cash.cop||0)-(old.deltaCOP||0)+deltaCOP;
+    updates[`transactions/${editingIngresoId}/amount`]=amt;
+    updates[`transactions/${editingIngresoId}/currency`]=cur;
+    updates[`transactions/${editingIngresoId}/note`]=note;
+    updates[`transactions/${editingIngresoId}/deltaUSD`]=deltaUSD;
+    updates[`transactions/${editingIngresoId}/deltaCOP`]=deltaCOP;
+    updates[`transactions/${editingIngresoId}/editedAt`]=now();
+    db.ref(`usuarios/${uid}`).update(updates);
+    editingIngresoId=null;
+  } else {
+    const tx={type:'ingreso',amount:amt,currency:cur,note,deltaUSD,deltaCOP,registeredAt:now()};
+    const ref=db.ref(`usuarios/${uid}/transactions`).push();
+    const updates={};
+    updates[`transactions/${ref.key}`]=tx;
+    updates['cash/usd']=(state.cash.usd||0)+deltaUSD;
+    updates['cash/cop']=(state.cash.cop||0)+deltaCOP;
+    db.ref(`usuarios/${uid}`).update(updates);
+  }
+  document.getElementById('ing-amount').value='';
+  document.getElementById('ing-note').value='';
+  document.getElementById('ing-btn').textContent='Registrar ingreso';
+  goScreen('dashboard');
+}
+
+// ── ASIGNACION ────────────────────────────────────────────────────────────
+function openAssignModal(sobreId, asignId){
+  currentSobreId=sobreId;
+  editingAsignId=asignId;
+  const s=state.sobres[sobreId]||{};
+  document.getElementById('assign-title').textContent=(asignId?'Editar asignación a':'Asignar a')+` ${s.emoji||''} ${s.name||''}`;
+  document.getElementById('assign-cur-label').textContent=`Monto (${s.currency||'COP'})`;
+  if(asignId){ document.getElementById('assign-amount').value=state.transactions[asignId]?.amount||''; }
+  else { document.getElementById('assign-amount').value=''; }
+  document.getElementById('modal-assign').style.display='flex';
+  setTimeout(()=>document.getElementById('assign-amount').focus(),100);
+}
+function closeAssignModal(e){ if(!e||e.target===document.getElementById('modal-assign')) document.getElementById('modal-assign').style.display='none'; }
+function saveAsign(){
+  const amt=parseFloat(document.getElementById('assign-amount').value)||0;
+  if(!amt||!currentSobreId) return;
+  const s=state.sobres[currentSobreId]||{};
+
+  if(editingAsignId){
+    const old=state.transactions[editingAsignId];
+    const oldAmt=old?.amount||0;
+    const updates={};
+    updates[`sobres/${currentSobreId}/assigned`]=(s.assigned||0)-oldAmt+amt;
+    updates[`transactions/${editingAsignId}/amount`]=amt;
+    updates[`transactions/${editingAsignId}/editedAt`]=now();
+    db.ref(`usuarios/${uid}`).update(updates);
+    editingAsignId=null;
+  } else {
+    const tx={type:'asignacion',sobreId:currentSobreId,amount:amt,currency:s.currency||'COP',note:`Asignado a ${s.emoji||''} ${s.name||''}`,registeredAt:now()};
+    const ref=db.ref(`usuarios/${uid}/transactions`).push();
+    const updates={};
+    updates[`transactions/${ref.key}`]=tx;
+    updates[`sobres/${currentSobreId}/assigned`]=(s.assigned||0)+amt;
+    db.ref(`usuarios/${uid}`).update(updates);
+  }
+  closeAssignModal();
+}
+
+// ── GASTO ─────────────────────────────────────────────────────────────────
+function openAddGasto(){
+  editingGastoId=null;
+  document.getElementById('gasto-title').textContent='Registrar gasto';
+  document.getElementById('gasto-btn').textContent='Registrar gasto';
+  document.getElementById('g-amount').value='';
+  document.getElementById('g-note').value='';
+  document.getElementById('g-paidUSD').value='';
+  document.getElementById('g-changeUSD').value='';
+  document.getElementById('g-changeCOP').value='';
+  document.getElementById('g-rate').value='';
+  isMixed=false;
+  document.getElementById('mixed-check').classList.remove('checked');
+  document.getElementById('mixed-check').textContent='';
+  document.getElementById('mixed-fields').style.display='none';
+  document.getElementById('simple-fields').style.display='block';
+  document.getElementById('sobre-bal-box').style.display='none';
+  currentSobreId=null;
+  goScreen('addGasto','sobres');
+  renderSobrePills();
+}
+function cancelGasto(){ editingGastoId=null; goScreen('sobres'); }
+function renderSobrePills(){
+  const c=document.getElementById('sobre-pills');
+  c.innerHTML='';
+  objToArr(state.sobres).forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='pill';
+    btn.textContent=`${s.emoji||'📦'} ${s.name}`;
+    if(s._key===currentSobreId){
+      btn.style.cssText=`border-color:${s.color||'#999'};background:${s.color||'#999'}22;color:${s.color||'#999'}`;
+    }
+    btn.onclick=()=>{
+      currentSobreId=s._key;
+      // set currency default
+      const newCur=s.currency==='USD'?'USD':'COP';
+      setToggle('g-cur',newCur, document.querySelector(`#simple-fields .tog-btn${newCur==='COP'?':first-child':':last-child'}`));
+      renderSobrePills();
+      renderSobreBal();
+    };
+    c.appendChild(btn);
+  });
+}
+function renderSobreBal(){
+  const box=document.getElementById('sobre-bal-box');
+  if(!currentSobreId){ box.style.display='none'; return; }
+  const s=state.sobres[currentSobreId];
+  if(!s){ box.style.display='none'; return; }
+  const bal=sobreBal(s);
+  box.style.cssText='display:block;padding:10px 14px;margin-bottom:8px;background:#252840;border-radius:12px;border:1px solid #2A2E4A';
+  box.innerHTML=`<div style="font-size:11px;color:#6B7099">Disponible · ${s.emoji||''} ${s.name}</div>
+    <div style="font-size:15px;font-weight:700;color:${bal<0?'#E07A5F':'#81B29A'};margin-top:2px">${fmt(Math.abs(bal),s.currency||'COP')}${bal<0?' (excedido)':''}</div>`;
+}
+function toggleMixed(){
+  isMixed=!isMixed;
+  const cb=document.getElementById('mixed-check');
+  cb.classList.toggle('checked',isMixed);
+  cb.textContent=isMixed?'✓':'';
+  document.getElementById('mixed-fields').style.display=isMixed?'block':'none';
+  document.getElementById('simple-fields').style.display=isMixed?'none':'block';
+}
+function saveGasto(){
+  if(!currentSobreId) return;
+  const s=state.sobres[currentSobreId];
+  if(!s) return;
+  const rate=state.exchangeRate||4100;
+  const f={
+    isMixed, currency:document.getElementById('g-cur').value,
+    amount:document.getElementById('g-amount').value,
+    paidUSD:document.getElementById('g-paidUSD').value,
+    changeUSD:document.getElementById('g-changeUSD').value,
+    changeCOP:document.getElementById('g-changeCOP').value,
+    rateUsed:document.getElementById('g-rate').value,
+  };
+  const cost=calcGastoCost(f,s.currency||'COP',rate);
+  const {deltaUSD,deltaCOP}=calcCashDelta(f,rate);
+  const note=document.getElementById('g-note').value||`${s.emoji||''} ${s.name}`;
+
+  if(editingGastoId){
+    const old=state.transactions[editingGastoId];
+    const updates={};
+    updates['cash/usd']=(state.cash.usd||0)-(old.deltaUSD||0)+deltaUSD;
+    updates['cash/cop']=(state.cash.cop||0)-(old.deltaCOP||0)+deltaCOP;
+    updates[`sobres/${old.sobreId}/spent`]=Math.max(0,(state.sobres[old.sobreId]?.spent||0)-(old.cost||0));
+    // after reverting old sobre, add to new
+    const newSpent=Math.max(0,(state.sobres[old.sobreId]?.spent||0)-(old.cost||0))+(old.sobreId===currentSobreId?cost:0);
+    updates[`sobres/${old.sobreId}/spent`]=newSpent;
+    if(old.sobreId!==currentSobreId) updates[`sobres/${currentSobreId}/spent`]=(s.spent||0)+cost;
+    const txUpdate={...f,type:'gasto',sobreId:currentSobreId,note,deltaUSD,deltaCOP,cost,rateUsed:parseFloat(f.rateUsed||rate),editedAt:now()};
+    updates[`transactions/${editingGastoId}`]=txUpdate;
+    db.ref(`usuarios/${uid}`).update(updates);
+    editingGastoId=null;
+  } else {
+    const tx={type:'gasto',sobreId:currentSobreId,note,...f,rateUsed:parseFloat(f.rateUsed||rate),deltaUSD,deltaCOP,cost,registeredAt:now()};
+    const ref=db.ref(`usuarios/${uid}/transactions`).push();
+    const updates={};
+    updates[`transactions/${ref.key}`]=tx;
+    updates['cash/usd']=(state.cash.usd||0)+deltaUSD;
+    updates['cash/cop']=(state.cash.cop||0)+deltaCOP;
+    updates[`sobres/${currentSobreId}/spent`]=(s.spent||0)+cost;
+    db.ref(`usuarios/${uid}`).update(updates);
+  }
+  goScreen('sobres');
+}
+
+// ── CAMBIO ────────────────────────────────────────────────────────────────
+function renderExchangeScreen(){
+  document.getElementById('ex-available').textContent=`${fmt(state.cash.usd||0,'USD')} · ${fmt(state.cash.cop||0,'COP')}`;
+  document.getElementById('ex-rate').placeholder=`Ref: ${state.exchangeRate||4100}`;
+  if(!editingCambioId){
+    document.getElementById('ex-usd').value='';
+    document.getElementById('ex-cop').value='';
+    document.getElementById('ex-rate').value='';
+    document.getElementById('ex-result').style.display='none';
+  }
+}
+function calcExchange(changed){
+  const usd=parseFloat(document.getElementById('ex-usd').value)||0;
+  const rate=parseFloat(document.getElementById('ex-rate').value)||0;
+  const cop=parseFloat(document.getElementById('ex-cop').value)||0;
+  if(changed==='usd'&&rate) document.getElementById('ex-cop').value=(usd*rate).toFixed(0);
+  if(changed==='rate'&&usd) document.getElementById('ex-cop').value=(usd*rate).toFixed(0);
+  if(changed==='cop'&&usd&&cop) document.getElementById('ex-rate').value=(cop/usd).toFixed(0);
+  const u=parseFloat(document.getElementById('ex-usd').value)||0;
+  const c=parseFloat(document.getElementById('ex-cop').value)||0;
+  const r=document.getElementById('ex-rate').value;
+  const res=document.getElementById('ex-result');
+  if(u&&c){
+    const eff=c/u; const ref=state.exchangeRate||4100;
+    res.style.display='block';
+    res.textContent=`Tasa efectiva: ${fmt(eff,'COP')}/USD · ${((eff-ref)/ref*100).toFixed(1)}% vs ref`;
+  } else { res.style.display='none'; }
+}
+function cancelCambio(){ editingCambioId=null; document.getElementById('exchange-title').textContent='Cambiar divisas'; document.getElementById('exchange-btn').textContent='Registrar cambio'; goScreen('dashboard'); }
+function saveCambio(){
+  const usdSold=parseFloat(document.getElementById('ex-usd').value)||0;
+  const copReceived=parseFloat(document.getElementById('ex-cop').value)||0;
+  if(!usdSold||!copReceived) return;
+  const rate=copReceived/usdSold;
+  const note=`Cambio: ${fmt(usdSold,'USD')} → ${fmt(copReceived,'COP')}`;
+
+  if(editingCambioId){
+    const old=state.transactions[editingCambioId];
+    const updates={};
+    updates['cash/usd']=(state.cash.usd||0)-(old.deltaUSD||0)+(-usdSold);
+    updates['cash/cop']=(state.cash.cop||0)-(old.deltaCOP||0)+copReceived;
+    updates[`transactions/${editingCambioId}/deltaUSD`]=-usdSold;
+    updates[`transactions/${editingCambioId}/deltaCOP`]=copReceived;
+    updates[`transactions/${editingCambioId}/rateUsed`]=rate;
+    updates[`transactions/${editingCambioId}/note`]=note;
+    updates[`transactions/${editingCambioId}/editedAt`]=now();
+    db.ref(`usuarios/${uid}`).update(updates);
+    editingCambioId=null;
+    document.getElementById('exchange-title').textContent='Cambiar divisas';
+    document.getElementById('exchange-btn').textContent='Registrar cambio';
+  } else {
+    const tx={type:'cambio',deltaUSD:-usdSold,deltaCOP:copReceived,rateUsed:rate,note,registeredAt:now()};
+    const ref=db.ref(`usuarios/${uid}/transactions`).push();
+    const updates={};
+    updates[`transactions/${ref.key}`]=tx;
+    updates['cash/usd']=(state.cash.usd||0)-usdSold;
+    updates['cash/cop']=(state.cash.cop||0)+copReceived;
+    db.ref(`usuarios/${uid}`).update(updates);
+  }
+  goScreen('dashboard');
+}
+
+// ── TRANSFERENCIA ─────────────────────────────────────────────────────────
+function renderTransferScreen(){
+  const from=document.getElementById('xfer-from');
+  const sobresArr=objToArr(state.sobres);
+  from.innerHTML='<option value="">— Selecciona —</option>';
+  sobresArr.forEach(s=>{ const o=document.createElement('option'); o.value=s._key; o.textContent=`${s.emoji||''} ${s.name} · ${fmt(sobreBal(s),s.currency||'COP')} disp.`; from.appendChild(o); });
+  renderXferTo();
+}
+function renderXferTo(){
+  const fromVal=document.getElementById('xfer-from').value;
+  const to=document.getElementById('xfer-to');
+  to.innerHTML='<option value="">— Selecciona —</option>';
+  objToArr(state.sobres).filter(s=>s._key!==fromVal).forEach(s=>{ const o=document.createElement('option'); o.value=s._key; o.textContent=`${s.emoji||''} ${s.name} · ${fmt(sobreBal(s),s.currency||'COP')} disp.`; to.appendChild(o); });
+}
+function saveXfer(){
+  const from=document.getElementById('xfer-from').value;
+  const to=document.getElementById('xfer-to').value;
+  const amt=parseFloat(document.getElementById('xfer-amount').value)||0;
+  const note=document.getElementById('xfer-note').value;
+  if(!from||!to||!amt||from===to) return;
+  const sFrom=state.sobres[from], sTo=state.sobres[to];
+  const ts=now();
+  const outRef=db.ref(`usuarios/${uid}/transactions`).push();
+  const inRef=db.ref(`usuarios/${uid}/transactions`).push();
+  const updates={};
+  updates[`transactions/${outRef.key}`]={type:'transferencia_salida',sobreId:from,amount:amt,currency:sFrom?.currency||'COP',note:note||`→ ${sTo?.emoji||''} ${sTo?.name||''}`,registeredAt:ts,linkedId:inRef.key};
+  updates[`transactions/${inRef.key}`]={type:'transferencia_entrada',sobreId:to,amount:amt,currency:sFrom?.currency||'COP',note:note||`← ${sFrom?.emoji||''} ${sFrom?.name||''}`,registeredAt:ts,linkedId:outRef.key};
+  updates[`sobres/${from}/assigned`]=(sFrom?.assigned||0)-amt;
+  updates[`sobres/${to}/assigned`]=(sTo?.assigned||0)+amt;
+  db.ref(`usuarios/${uid}`).update(updates);
+  document.getElementById('xfer-from').value='';
+  document.getElementById('xfer-to').value='';
+  document.getElementById('xfer-amount').value='';
+  document.getElementById('xfer-note').value='';
+  goScreen('sobres');
+}
+
+// ── ARCHIVE ───────────────────────────────────────────────────────────────
+function openArchiveModal(sobreId){
+  archiveTargetId=sobreId;
+  const s=state.sobres[sobreId]||{};
+  document.getElementById('arch-title').textContent=`Archivar ${s.emoji||''} ${s.name||''}`;
+  document.getElementById('arch-sub').textContent=`Asignado: ${fmt(s.assigned||0,s.currency||'COP')} · Gastado: ${fmt(s.spent||0,s.currency||'COP')}`;
+  document.getElementById('modal-archive').style.display='flex';
+}
+function closeArchiveModal(e){ if(!e||e.target===document.getElementById('modal-archive')) document.getElementById('modal-archive').style.display='none'; }
+function confirmArchive(){
+  if(!archiveTargetId) return;
+  const s=state.sobres[archiveTargetId];
+  const txs=state.transactions;
+  const txsOfSobre={};
+  Object.entries(txs||{}).forEach(([k,v])=>{ if(v.sobreId===archiveTargetId) txsOfSobre[k]=v; });
+  const archived={...s,archivedAt:now(),transactions:txsOfSobre};
+  const updates={};
+  updates[`archivedSobres/${archiveTargetId}_${Date.now()}`]=archived;
+  updates[`sobres/${archiveTargetId}`]=null;
+  db.ref(`usuarios/${uid}`).update(updates);
+  closeArchiveModal();
+  archiveTargetId=null;
+}
+function openArchivedView(s){
+  document.getElementById('av-title').textContent=`${s.emoji||''} ${s.name||''}`;
+  document.getElementById('av-date').textContent=`Archivado ${fmtDT(s.archivedAt)}`;
+  document.getElementById('av-assigned').textContent=fmt(s.assigned||0,s.currency||'COP');
+  document.getElementById('av-spent').textContent=fmt(s.spent||0,s.currency||'COP');
+  const list=document.getElementById('av-txlist');
+  list.innerHTML='';
+  const txs=Object.values(s.transactions||{}).filter(t=>t.type==='gasto').sort((a,b)=>b.registeredAt?.localeCompare(a.registeredAt));
+  if(txs.length===0){ list.innerHTML='<div class="empty">Sin gastos registrados</div>'; }
+  txs.forEach(tx=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #141620';
+    row.innerHTML=`<div><div style="font-size:13px;color:#E8E8F0">${tx.note||'Gasto'}</div><div style="font-size:11px;color:#6B7099">${fmtDT(tx.registeredAt)}</div></div>
+      <div style="font-size:13px;font-weight:700;color:#E07A5F">${tx.isMixed?`-${fmt(parseFloat(tx.paidUSD||0),'USD')}`:fmt(tx.cost||0,s.currency||'COP')}</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('archived-view').style.display='block';
+}
+function closeArchivedView(){ document.getElementById('archived-view').style.display='none'; }
+
+// ── DELETE ────────────────────────────────────────────────────────────────
+function openDeleteModal(txKey){
+  deleteTargetId=txKey;
+  const tx=state.transactions[txKey]||{};
+  const sobresMap={};
+  objToArr(state.sobres).forEach(s=>sobresMap[s._key]=s);
+  const s=sobresMap[tx.sobreId]||{};
+  const typeLabels={ingreso:'Ingreso',gasto:'Gasto',cambio:'Cambio de divisas',asignacion:'Asignación',transferencia_salida:'Transferencia',transferencia_entrada:'Transferencia'};
+  let sub=fmtDT(tx.registeredAt);
+  if(tx.type==='gasto') sub+=` · ${s.emoji||''} ${s.name||''} · ${fmt(tx.cost||0,s.currency||'COP')}`;
+  else if(tx.type==='ingreso') sub+=` · ${fmt(parseFloat(tx.amount||0),tx.currency||'USD')}`;
+  else if(tx.type==='cambio') sub+=` · ${fmt(Math.abs(tx.deltaUSD||0),'USD')} → ${fmt(tx.deltaCOP||0,'COP')}`;
+  else if(tx.type==='asignacion') sub+=` · ${fmt(tx.amount||0,tx.currency||'COP')} → ${s.emoji||''} ${s.name||''}`;
+  else if(tx.type?.startsWith('transferencia')) sub+=` · ${fmt(tx.amount||0,tx.currency||'COP')}`;
+  document.getElementById('del-title').textContent=tx.note||typeLabels[tx.type]||'Registro';
+  document.getElementById('del-sub').textContent=sub;
+  document.getElementById('modal-delete').style.display='flex';
+}
+function closeDeleteModal(e){ if(!e||e.target===document.getElementById('modal-delete')) document.getElementById('modal-delete').style.display='none'; }
+function confirmDelete(){
+  if(!deleteTargetId) return;
+  const tx=state.transactions[deleteTargetId];
+  if(!tx){ closeDeleteModal(); return; }
+  const updates={};
+  updates[`transactions/${deleteTargetId}`]=null;
+
+  if(tx.type==='ingreso'){
+    updates['cash/usd']=(state.cash.usd||0)-(tx.deltaUSD||0);
+    updates['cash/cop']=(state.cash.cop||0)-(tx.deltaCOP||0);
+  } else if(tx.type==='gasto'){
+    updates['cash/usd']=(state.cash.usd||0)-(tx.deltaUSD||0);
+    updates['cash/cop']=(state.cash.cop||0)-(tx.deltaCOP||0);
+    updates[`sobres/${tx.sobreId}/spent`]=Math.max(0,(state.sobres[tx.sobreId]?.spent||0)-(tx.cost||0));
+  } else if(tx.type==='cambio'){
+    updates['cash/usd']=(state.cash.usd||0)-(tx.deltaUSD||0);
+    updates['cash/cop']=(state.cash.cop||0)-(tx.deltaCOP||0);
+  } else if(tx.type==='asignacion'){
+    updates[`sobres/${tx.sobreId}/assigned`]=Math.max(0,(state.sobres[tx.sobreId]?.assigned||0)-(tx.amount||0));
+  } else if(tx.type==='transferencia_salida'){
+    updates[`sobres/${tx.sobreId}/assigned`]=(state.sobres[tx.sobreId]?.assigned||0)+(tx.amount||0);
+    if(tx.linkedId){
+      const linked=state.transactions[tx.linkedId];
+      if(linked){ updates[`transactions/${tx.linkedId}`]=null; updates[`sobres/${linked.sobreId}/assigned`]=Math.max(0,(state.sobres[linked.sobreId]?.assigned||0)-(tx.amount||0)); }
+    }
+  } else if(tx.type==='transferencia_entrada'){
+    updates[`sobres/${tx.sobreId}/assigned`]=Math.max(0,(state.sobres[tx.sobreId]?.assigned||0)-(tx.amount||0));
+    if(tx.linkedId){
+      const linked=state.transactions[tx.linkedId];
+      if(linked){ updates[`transactions/${tx.linkedId}`]=null; updates[`sobres/${linked.sobreId}/assigned`]=(state.sobres[linked.sobreId]?.assigned||0)+(tx.amount||0); }
+    }
+  }
+  db.ref(`usuarios/${uid}`).update(updates);
+  closeDeleteModal();
+  deleteTargetId=null;
+}
+
+// ── EDIT DISPATCHER ───────────────────────────────────────────────────────
+function openEdit(txKey){
+  const tx=state.transactions[txKey];
+  if(!tx) return;
+  if(tx.type==='ingreso'){
+    editingIngresoId=txKey;
+    document.getElementById('ing-amount').value=tx.amount||'';
+    document.getElementById('ing-note').value=tx.note||'';
+    setToggle('ing-cur',tx.currency||'USD');
+    document.getElementById('ingreso-title').textContent='Editar ingreso';
+    document.getElementById('ing-btn').textContent='Guardar cambios';
+    goScreen('ingreso','history');
+  } else if(tx.type==='cambio'){
+    editingCambioId=txKey;
+    const usd=Math.abs(tx.deltaUSD||0), cop=tx.deltaCOP||0;
+    document.getElementById('ex-usd').value=usd;
+    document.getElementById('ex-cop').value=cop;
+    document.getElementById('ex-rate').value=usd>0?(cop/usd).toFixed(0):'';
+    document.getElementById('exchange-title').textContent='Editar cambio';
+    document.getElementById('exchange-btn').textContent='Guardar cambios';
+    goScreen('exchange','history');
+    calcExchange('usd');
+  } else if(tx.type==='asignacion'){
+    openAssignModal(tx.sobreId, txKey);
+  } else if(tx.type==='transferencia_salida'||tx.type==='transferencia_entrada'){
+    // for simplicity: delete and let user re-create
+    alert('Para editar una transferencia, elimínala y créala de nuevo.');
+  } else if(tx.type==='gasto'){
+    editingGastoId=txKey;
+    currentSobreId=tx.sobreId;
+    document.getElementById('gasto-title').textContent='Editar gasto';
+    document.getElementById('gasto-btn').textContent='Guardar cambios';
+    document.getElementById('g-amount').value=tx.amount||'';
+    document.getElementById('g-note').value=tx.note||'';
+    document.getElementById('g-paidUSD').value=tx.paidUSD||'';
+    document.getElementById('g-changeUSD').value=tx.changeUSD||'';
+    document.getElementById('g-changeCOP').value=tx.changeCOP||'';
+    document.getElementById('g-rate').value=tx.rateUsed||'';
+    isMixed=tx.isMixed||false;
+    const cb=document.getElementById('mixed-check');
+    cb.classList.toggle('checked',isMixed); cb.textContent=isMixed?'✓':'';
+    document.getElementById('mixed-fields').style.display=isMixed?'block':'none';
+    document.getElementById('simple-fields').style.display=isMixed?'none':'block';
+    setToggle('g-cur',tx.currency||'COP');
+    goScreen('addGasto','history');
+    renderSobrePills();
+    renderSobreBal();
+  }
+}
+
+// ── SOBRE EDITOR ──────────────────────────────────────────────────────────
+let sobreEditorEmoji='📦';
+function openNewSobre(){
+  editSobreId=null;
+  sobreEditorEmoji='📦';
+  document.getElementById('sobre-modal-title').textContent='Nuevo sobre';
+  document.getElementById('sobre-name').value='';
+  document.getElementById('sobre-del-btn').style.display='none';
+  document.getElementById('emoji-preview-btn').firstChild.textContent='📦 ';
+  setSobreCur('COP');
+  setColor(CAT_COLORS[0]);
+  buildEmojiGrid(); buildColorGrid();
+  document.getElementById('modal-sobre').style.display='flex';
+}
+function openEditSobre(sobreKey){
+  const s=state.sobres[sobreKey];
+  if(!s) return;
+  editSobreId=sobreKey;
+  sobreEditorEmoji=s.emoji||'📦';
+  document.getElementById('sobre-modal-title').textContent='Editar sobre';
+  document.getElementById('sobre-name').value=s.name||'';
+  document.getElementById('sobre-del-btn').style.display='block';
+  document.getElementById('emoji-preview-btn').childNodes[0].textContent=sobreEditorEmoji+' ';
+  setSobreCur(s.currency||'COP');
+  setColor(s.color||CAT_COLORS[0]);
+  buildEmojiGrid(); buildColorGrid();
+  document.getElementById('modal-sobre').style.display='flex';
+}
+function closeSobreModal(e){ if(!e||e.target===document.getElementById('modal-sobre')) document.getElementById('modal-sobre').style.display='none'; }
+function buildEmojiGrid(){
+  const g=document.getElementById('emoji-picker');
+  g.innerHTML='';
+  EMOJIS.forEach(e=>{
+    const btn=document.createElement('button');
+    btn.className='emoji-btn'+(e===sobreEditorEmoji?' sel':'');
+    btn.textContent=e;
+    btn.onclick=()=>{ sobreEditorEmoji=e; document.getElementById('emoji-preview-btn').childNodes[0].textContent=e+' '; document.getElementById('emoji-picker').style.display='none'; buildEmojiGrid(); };
+    g.appendChild(btn);
+  });
+}
+function buildColorGrid(){
+  const g=document.getElementById('color-grid');
+  g.innerHTML='';
+  const cur=document.getElementById('sobre-color').value;
+  CAT_COLORS.forEach(c=>{
+    const d=document.createElement('button');
+    d.className='color-dot'+(c===cur?' sel':'');
+    d.style.background=c;
+    d.onclick=()=>setColor(c);
+    g.appendChild(d);
+  });
+}
+function setColor(c){
+  document.getElementById('sobre-color').value=c;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('sel',d.style.background===c||rgbMatch(d.style.background,c)));
+}
+function rgbMatch(rgb,hex){
+  // simple check
+  const tmp=document.createElement('div'); tmp.style.background=hex; document.body.appendChild(tmp);
+  const cs=getComputedStyle(tmp).background; document.body.removeChild(tmp);
+  return rgb===cs;
+}
+function toggleEmojiPicker(){
+  const p=document.getElementById('emoji-picker');
+  p.style.display=p.style.display==='none'?'grid':'none';
+}
+function setSobreCur(cur, btn){
+  document.getElementById('sobre-cur').value=cur;
+  document.querySelectorAll('#modal-sobre .tog-btn').forEach((b,i)=>b.classList.toggle('active',(cur==='COP'?i===0:i===1)));
+}
+function saveSobre(){
+  const name=document.getElementById('sobre-name').value.trim();
+  if(!name) return;
+  const cur=document.getElementById('sobre-cur').value;
+  const color=document.getElementById('sobre-color').value;
+  if(editSobreId){
+    dbUpdate(`sobres/${editSobreId}`,{name,emoji:sobreEditorEmoji,currency:cur,color});
+  } else {
+    const id=`s_${Date.now()}`;
+    dbSet(`sobres/${id}`,{id,name,emoji:sobreEditorEmoji,currency:cur,color,assigned:0,spent:0,openedAt:now()});
+  }
+  closeSobreModal();
+}
+function deleteSobre(){
+  if(!editSobreId) return;
+  if(!confirm('¿Eliminar este sobre?')) return;
+  dbRemove(`sobres/${editSobreId}`);
+  closeSobreModal();
+}
+
+// ── TOGGLE HELPERS ────────────────────────────────────────────────────────
+function setToggle(hiddenId, val, clickedBtn){
+  document.getElementById(hiddenId).value=val;
+  // find parent .tog and toggle buttons
+  const input=document.getElementById(hiddenId);
+  const tog=input.previousElementSibling;
+  if(tog&&tog.classList.contains('tog')){
+    tog.querySelectorAll('.tog-btn').forEach(b=>b.classList.remove('active'));
+    if(clickedBtn) clickedBtn.classList.add('active');
+    else {
+      // find by matching text
+      tog.querySelectorAll('.tog-btn').forEach(b=>{ if(b.textContent.trim()===val) b.classList.add('active'); });
+    }
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'){ if(document.getElementById('auth-screen').style.display!=='none') submitAuth(); } });
+// init color grid on page load
+window.addEventListener('load',()=>{ buildColorGrid(); });
+</script>
+</body>
+</html>
