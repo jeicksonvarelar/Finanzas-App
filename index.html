@@ -609,7 +609,31 @@ function saveSobre(){const name=document.getElementById('sobre-name').value.trim
 function deleteSobre(){if(!editSobreId)return;if(!confirm('Eliminar este sobre?'))return;db.ref('usuarios/'+uid+'/sobres/'+editSobreId).remove();closeSobreModal();}
 
 // TOGGLE HELPER
-function setToggle(hiddenId,val,clickedBtn){document.getElementById(hiddenId).value=val;const inp=document.getElementById(hiddenId),tog=inp.previousElementSibling;if(tog&&tog.classList.contains('tog')){tog.querySelectorAll('.tog-btn').forEach(b=>b.classList.remove('active'));if(clickedBtn){clickedBtn.classList.add('active');}else{tog.querySelectorAll('.tog-btn').forEach(b=>{if(b.textContent.trim()===val||b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+val+"'")){b.classList.add('active');}});}}}
+function setToggle(hiddenId,val,clickedBtn){
+  document.getElementById(hiddenId).value=val;
+  if(clickedBtn){
+    const tog=clickedBtn.closest('.tog');
+    if(tog){tog.querySelectorAll('.tog-btn').forEach(b=>b.classList.remove('active'));clickedBtn.classList.add('active');}
+    return;
+  }
+  // Called programmatically — find tog near the hidden input
+  const inp=document.getElementById(hiddenId);
+  let tog=inp.previousElementSibling;
+  // walk up siblings to find .tog
+  let el=inp;
+  while(el&&!tog?.classList?.contains('tog')){el=el.previousElementSibling;tog=el;}
+  // also search within parent
+  if(!tog||!tog.classList.contains('tog')){
+    const parent=inp.closest('.field,.row,.screen');
+    if(parent)tog=parent.querySelector('.tog');
+  }
+  if(tog&&tog.classList.contains('tog')){
+    tog.querySelectorAll('.tog-btn').forEach(b=>b.classList.remove('active'));
+    tog.querySelectorAll('.tog-btn').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+val+"'")){b.classList.add('active');}
+    });
+  }
+}
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('auth-screen').style.display!=='none')submitAuth();});
 window.addEventListener('load',()=>{buildColorGrid();});
